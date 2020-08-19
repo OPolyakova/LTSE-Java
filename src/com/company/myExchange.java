@@ -6,14 +6,13 @@ import java.util.function.Function;
 import java.lang.Integer;
 
 class myExchange extends basicTrade {
-    private boolean header = true;
 
     private final class trade {				//data struct for trade info
         int sec;
         String[] recTokens;
 
         trade(String rec) {
-            recTokens = rec.split(",");
+            recTokens = rec.split(_delim);
             String[] date_time = get(indexOf("time_stamp")).split(" ")[1].split(":");
 
             int num = 60*60;
@@ -27,11 +26,11 @@ class myExchange extends basicTrade {
 
         Boolean isValid() {
             List<String> myList = new ArrayList<>(Arrays.asList(recTokens));
-            return myList.indexOf("") == -1 && recTokens.length == 8;
+            return myList.indexOf("") == -1 && recTokens.length == fieldsCount();
         }
 
         String get(Integer i) {
-            if (i < recTokens.length) return recTokens[i];
+            if (i < fieldsCount() && i >= 0) return recTokens[i];
             return "";
         }
     }
@@ -222,8 +221,8 @@ class myExchange extends basicTrade {
 
     //evaluate the trade record
     Boolean processTrade(String record) {
-        if (header) {                       //ignore header
-            header = false;
+        if (_header) {                       //ignore header
+            _header = false;
             writeToFile(record,outRejected);
             writeToFile(record,outValid);
             return true;
